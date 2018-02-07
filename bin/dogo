@@ -1,0 +1,35 @@
+#!/usr/bin/env node
+
+const path = require('path');
+const exists= require('fs').existsSync;
+const download = require('download-git-repo');
+const program = require('commander');
+const chalk = require('chalk');
+const ora = require('ora'); 
+const home = require('user-home');
+
+program.usage('<project-name>');
+program.on('--help', () => {
+  console.log()
+  console.log()
+  console.log('  示例:')
+  console.log()
+  console.log(chalk.gray('    # 直接从github模板创建一个新项目：'))
+  console.log('    $ dogo my-project')
+  console.log()
+});
+
+function help(){
+  program.parse(process.argv);
+  if (program.args.length < 1) return program.help();
+}
+help();
+
+let tmp = path.join(home, program.args[0]);
+const spinner = ora('下载模板开始');
+spinner.start();
+download('zkzhao/webpack-pitbull', tmp, function (err) {
+  spinner.stop();
+  console.log(err ? '下载出错！' : '下载完成！');
+});
+

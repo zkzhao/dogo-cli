@@ -1,0 +1,31 @@
+{
+  "name": "dogo",
+  "version": "1.0.0",
+  "description": "CLI projects",
+  "bin": {
+    "dogo": "bin/dogo",
+    "dogo-init": "bin/dogo-init",
+    "dogo-multi": "bin/dogo-multi"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zkzhao/dogo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zkzhao/dogo/issues"
+  },
+  "homepage": "https://github.com/zkzhao/dogo#readme",
+  "dependencies": {
+    "chalk": "^2.3.0",
+    "commander": "^2.13.0",
+    "download-git-repo": "^1.0.2",
+    "ora": "^1.4.0",
+    "user-home": "^2.0.0"
+  }
+}
