@@ -7,6 +7,7 @@ const program = require('commander');
 const chalk = require('chalk');
 const ora = require('ora'); 
 const home = require('user-home');
+const Metalsmith = require('metalsmith');
 
 program.usage('<project-name>');
 program.on('--help', () => {
@@ -25,11 +26,30 @@ function help(){
 }
 help();
 
-let tmp = path.join(home, program.args[0]);
+
+const rawName = program.args[0];
+const tmp = path.join(home, rawName);
+const to = path.resolve(rawName || '.');
 const spinner = ora('下载模板开始');
 spinner.start();
 download('zkzhao/webpack-pitbull', tmp, function (err) {
   spinner.stop();
-  console.log(err ? '下载出错！' : '下载完成！');
+  generate(rawName, tmp, to, function(){
+    if (err) {
+      console.log(chalk.red('下载出错！'));
+    } else {
+      console.log(chalk.green('下载完成！'));
+    }
+  });
+  
 });
 
+function generate(name,src,dest,done){
+  const metalsmith = Metalsmith(path.join(src, 'vue-build'));
+  metalsmith
+    .source('.')
+    .destination(dest)
+    .build((err, files) => {
+      done(err);
+    })
+}
