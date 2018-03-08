@@ -7,7 +7,9 @@ const program = require('commander');
 const chalk = require('chalk');
 const ora = require('ora'); 
 const home = require('user-home');
+const inquirer = require('inquirer');
 const Metalsmith = require('metalsmith');
+const rm = require('rimraf').sync;
 
 program.usage('<project-name>');
 program.on('--help', () => {
@@ -26,30 +28,56 @@ function help(){
 }
 help();
 
-
-const rawName = program.args[0];
-const tmp = path.join(home, rawName);
-const to = path.resolve(rawName || '.');
-const spinner = ora('下载模板开始');
-spinner.start();
-download('zkzhao/webpack-pitbull', tmp, function (err) {
-  spinner.stop();
-  generate(rawName, tmp, to, function(){
-    if (err) {
-      console.log(chalk.red('下载出错！'));
-    } else {
-      console.log(chalk.green('下载完成！'));
-    }
-  });
-  
+inquirer.prompt([
+  {
+    type: 'list',
+    name: 'projectType',
+    message: '请选择要生成的脚手架：',
+    choices: [
+      {
+        name: 'Web App',
+        value: 'muti-web'
+      },
+      {
+        name: 'Vue App',
+        value: 'Vue'
+      }
+    ]
+  }
+]).then(function(answers){
+  downloadTpl(answers);
 });
 
-function generate(name,src,dest,done){
-  const metalsmith = Metalsmith(path.join(src, 'vue-build'));
+function downloadTpl(promptVal) {
+  const rawName = program.args[0];
+  const tmp = path.join(home, rawName);
+  const to = path.resolve(rawName || '.');
+  const spinner = ora('下载模板开始');
+  spinner.start();
+  download('zkzhao/pitbull-webpack', tmp, function (err) {
+    spinner.stop();
+    generate(promptVal, tmp, to, function(){
+      if(err){
+        console.log(chalk.red(`项目创建失败: ${err}`));
+        process.exit();
+      }else{
+        console.log(chalk.green('项目创建完成'));
+      }
+    });
+  });
+}
+
+function generate(promptVal,src,dest,done){
+  var projectName = promptVal.projectType;
+  if (promptVal.projectType === "muti-web"){
+    projectName= "Web";
+  }
+  const metalsmith = Metalsmith(path.join(src, projectName));
   metalsmith
     .source('.')
     .destination(dest)
     .build((err, files) => {
+      rm(src);
       done(err);
     })
 }
