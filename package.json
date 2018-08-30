@@ -1,5 +1,5 @@
 {
-  "name": "dogo",
+  "name": "dogo-cli",
   "version": "1.0.0",
   "description": "WBD-CLI projects",
   "bin": {
