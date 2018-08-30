@@ -59,7 +59,7 @@ function downloadTpl(promptVal) {
   const to = path.resolve(rawName || '.');
   const spinner = ora('模板下载中...');
   spinner.start();
-  download('gitlab:git.chongkouwei.com:wubida/fe-template', tmp, { clone:true }, function (err) {
+  download('http://git.chongkouwei.com:wubida/fe-template', tmp, { clone:true }, function (err) {
     spinner.stop();
     generate(promptVal, tmp, to, function(){
       if(err){
