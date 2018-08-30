@@ -1,3 +1,6 @@
 # dogo-cli
-1. `npm link`
-2. `dogo <project-name>`
+## Install
+`npm install -g dogo`
+
+## Usage
+`dogo <project-name>`

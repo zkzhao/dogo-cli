@@ -1,7 +1,7 @@
 {
   "name": "dogo",
   "version": "1.0.0",
-  "description": "CLI projects",
+  "description": "WBD-CLI projects",
   "bin": {
     "dogo": "bin/dogo"
   },
