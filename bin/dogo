@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 const path = require('path');
-const exists= require('fs').existsSync;
 const download = require('download-git-repo');
 const program = require('commander');
 const chalk = require('chalk');
@@ -17,7 +16,7 @@ program.on('--help', () => {
   console.log()
   console.log('  示例:')
   console.log()
-  console.log(chalk.gray('    # 直接从github模板创建一个新项目：'))
+  console.log(chalk.gray('    # 创建一个新项目：'))
   console.log('    $ dogo my-project')
   console.log()
 });
@@ -32,15 +31,19 @@ inquirer.prompt([
   {
     type: 'list',
     name: 'projectType',
-    message: '请选择要生成的脚手架：',
+    message: '请选择要开发的项目框架：',
     choices: [
       {
-        name: 'Web App',
-        value: 'muti-web'
+        name: 'Vue',
+        value: 'vue'
       },
       {
-        name: 'Vue App',
-        value: 'Vue'
+        name: 'React',
+        value: 'react'
+      },
+      {
+        name: 'React-Native',
+        value: 'react-naitve'
       }
     ]
   }
@@ -48,29 +51,54 @@ inquirer.prompt([
   downloadTpl(answers);
 });
 
+
+
 function downloadTpl(promptVal) {
   const rawName = program.args[0];
   const tmp = path.join(home, rawName);
   const to = path.resolve(rawName || '.');
-  const spinner = ora('下载模板开始');
+  const spinner = ora('模板下载中...');
   spinner.start();
-  download('zkzhao/pitbull-webpack', tmp, function (err) {
+  download('gitlab:git.chongkouwei.com:wubida/fe-template', tmp, { clone:true }, function (err) {
     spinner.stop();
     generate(promptVal, tmp, to, function(){
       if(err){
         console.log(chalk.red(`项目创建失败: ${err}`));
         process.exit();
       }else{
+        console.log(chalk.cyan('##########  物必达科技  ##########'));
+        console.log(chalk.cyan('##                              ##'));
+        console.log(chalk.cyan('##                              ##'));
+        console.log(chalk.cyan('##       项目快速构建系统       ##'));
+        console.log(chalk.cyan('##          dogo 稳！           ##'));
+        console.log(chalk.cyan('##                              ##'));
+        console.log(chalk.cyan('##            ___               ##'));
+        console.log(chalk.cyan('##      |     | |               ##'));
+        console.log(chalk.cyan('##     / \\    | |               ##'));
+        console.log(chalk.cyan('##    |--o|===|-|               ##'));
+        console.log(chalk.cyan('##    |--o|===|-|               ##'));
+        console.log(chalk.cyan('##    |---|   | |               ##'));
+        console.log(chalk.cyan('##   /     \\  |D|               ##'));
+        console.log(chalk.cyan('##  | W     | |O|               ##'));
+        console.log(chalk.cyan('##  | B     |=|G|               ##'));
+        console.log(chalk.cyan('##  | D     | |O|               ##'));
+        console.log(chalk.cyan('##  |_______| |_|               ##'));
+        console.log(chalk.cyan('##   |@| |@|  | |               ##'));
+        console.log(chalk.cyan('##____________|_|_              ##'));
+        console.log(chalk.cyan('##                              ##'));
+        console.log(chalk.cyan('##################################'));
         console.log(chalk.green('项目创建完成'));
+        console.log(chalk.magenta('苦逼赶紧撸码吧!'));
       }
     });
   });
 }
 
-function generate(promptVal,src,dest,done){
-  var projectName = promptVal.projectType;
-  if (promptVal.projectType === "muti-web"){
-    projectName= "Web";
+function generate(promptVal, src, dest, doneCallback){
+  let projectName = promptVal.projectType;
+  if(projectName === 'react' || projectName === 'react-native'){
+    console.log(chalk.green('项目模板还没写完，敬请期待!'));
+    return ;
   }
   const metalsmith = Metalsmith(path.join(src, projectName));
   metalsmith
@@ -78,6 +106,6 @@ function generate(promptVal,src,dest,done){
     .destination(dest)
     .build((err, files) => {
       rm(src);
-      done(err);
+      doneCallback(err);
     })
 }
