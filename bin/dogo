@@ -10,56 +10,76 @@ const inquirer = require('inquirer');
 const Metalsmith = require('metalsmith');
 const rm = require('rimraf').sync;
 
-program.usage('<project-name>');
-program.on('--help', () => {
-  console.log()
-  console.log()
-  console.log('  示例:')
-  console.log()
-  console.log(chalk.gray('    # 创建一个新项目：'))
-  console.log('    $ dogo my-project')
-  console.log()
-});
-
-function help(){
-  program.parse(process.argv);
-  if (program.args.length < 1) return program.help();
+const options={
+  gitHTTP:  'http://git.chongkouwei.com:wubida/fe-template',
+  gitSSH: 'gitlab:git.chongkouwei.com:wubida/fe-template'
 }
-help();
 
-inquirer.prompt([
-  {
-    type: 'list',
-    name: 'projectType',
-    message: '请选择要开发的项目框架：',
-    choices: [
-      {
-        name: 'Vue',
-        value: 'vue'
-      },
-      {
-        name: 'React',
-        value: 'react'
-      },
-      {
-        name: 'React-Native',
-        value: 'react-naitve'
-      }
-    ]
-  }
-]).then(function(answers){
-  downloadTpl(answers);
-});
+program.version('1.0.1')
+  .description('物必达科技项目构建系统 -- Dogo')
+  .usage('<project-name>')
+  .on('--help', () => {
+    console.log()
+    console.log()
+    console.log('  Example:')
+    console.log()
+    console.log(chalk.gray('    # 创建一个新项目：'))
+    console.log('    $ dogo init <my-project>')
+    console.log()
+    console.log(chalk.gray('    # 使用SSH创建新项目：'))
+    console.log('    $ dogo init <my-project> --ssh')
+    console.log()
+  });
 
+program.command('init')
+  .description('创建新的项目')
+  .action(function() {
+    console.log("init",program.args)
+    // inquirer.prompt([
+    //   {
+    //     type: 'list',
+    //     name: 'projectType',
+    //     message: '请选择要开发的项目框架：',
+    //     choices: [
+    //       {
+    //         name: 'Vue',
+    //         value: 'vue'
+    //       },
+    //       {
+    //         name: 'React',
+    //         value: 'react'
+    //       },
+    //       {
+    //         name: 'React-Native',
+    //         value: 'react-naitve'
+    //       }
+    //     ]
+    //   }
+    // ]).then(function(answers){
+    //   downloadTpl(answers);
+    // });
+  });
 
+function startHelp(){
+  // 解析命令行
+  program.parse(process.argv);
+  // 不传入参数则返回帮助信息
+  console.log(program.args.length < 1)
+  console.log(program.args)
+  if (program.args.length < 1 || program.args[0]!=='init') return program.help();
+}
+startHelp();
 
 function downloadTpl(promptVal) {
   const rawName = program.args[0];
+  const gitUrl =  program.args[1] === '--ssh' ? options.gitSSH : options.gitHTTP;
+  console.log(program.args[1])
   const tmp = path.join(home, rawName);
   const to = path.resolve(rawName || '.');
   const spinner = ora('模板下载中...');
   spinner.start();
-  download('http://git.chongkouwei.com:wubida/fe-template', tmp, { clone:true }, function (err) {
+
+  download(gitUrl, tmp, { clone:true }, function (err) {
     spinner.stop();
     generate(promptVal, tmp, to, function(){
       if(err){
@@ -88,7 +108,7 @@ function downloadTpl(promptVal) {
         console.log(chalk.cyan('##                              ##'));
         console.log(chalk.cyan('##################################'));
         console.log(chalk.green('项目创建完成'));
-        console.log(chalk.magenta('苦逼赶紧撸码吧!'));
+        console.log(chalk.yellow('苦逼赶紧撸码吧!'));
       }
     });
   });
