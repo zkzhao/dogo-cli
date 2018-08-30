@@ -1,6 +1,6 @@
 # dogo-cli
 ## Install
-`npm install -g dogo`
+`npm install dogo --global`
 
 ## Usage
 `dogo <project-name>`
