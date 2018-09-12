@@ -11,10 +11,9 @@ const Metalsmith = require('metalsmith');
 const rm = require('rimraf').sync;
 
 const options={
-  gitHTTP:  'http://git.chongkouwei.com:wubida/fe-template',
+  gitHTTP: 'http://git.chongkouwei.com:wubida/fe-template',
   gitSSH: 'gitlab:git.chongkouwei.com:wubida/fe-template'
 }
-
 program
   .version('1.0.2')
   .description('物必达科技项目构建系统 -- Dogo')
@@ -62,27 +61,50 @@ if(program.args.length < 1){
  * 命令敲对就开始
  */
 function startCli(){
-  inquirer.prompt([
-    {
-      type: 'list',
-      name: 'projectType',
-      message: '请选择要开发的项目框架：',
-      choices: [
-        {
-          name: 'Vue',
-          value: 'vue'
-        },
-        {
-          name: 'React',
-          value: 'react'
-        },
-        {
-          name: 'React-Native',
-          value: 'react-naitve'
-        }
-      ]
-    }
-  ]).then(function(answers){
+  let promps= [];
+  promps.push({
+    type: 'list',
+    name: 'projectType',
+    message: '请选择要开发的项目框架：',
+    choices: [
+      {
+        name: 'Vue',
+        value: 'vue'
+      },
+      {
+        name: 'React',
+        value: 'react'
+      },
+      {
+        name: 'React-Native',
+        value: 'react-naitve'
+      },
+      {
+        name: 'Mpvue',
+        value: 'mpvue'
+      }
+    ]
+  })
+  promps.push({
+    when: function(answers) {
+      return answers.projectType === 'vue';
+    },
+    type: 'list',
+    name: 'allvue',
+    message: '看看哪个适合你，老板：',
+    choices: [
+      {
+        name: 'wap vue',
+        value: 'wapvue'
+      },
+      {
+        name: 'admin vue',
+        value: 'adminvue'
+      }
+    ]
+  })
+
+  inquirer.prompt(promps).then(function(answers){
     downloadTpl(answers);
   });
 }
@@ -92,14 +114,19 @@ function startCli(){
  * @param promptVal 用户选择的答案
  */
 function downloadTpl(promptVal) {
+  // 判断是ssh下载方式还是https
   const ssh = program.args[program.args.length-1].ssh;
+  // 要创业的项目的名字
   const rawName = ssh ? ssh : program.args[0];
+  // 拉取的项目的git地址
   const gitUrl =  ssh ? options.gitSSH : options.gitHTTP;
+  // 模板零时存放的路径
   const tmp = path.join(home, rawName);
+  // 模板真实存放的路径
   const to = path.resolve(rawName || '.');
   const spinner = ora('模板下载中...');
   spinner.start();
-
+  
   download(gitUrl, tmp, { clone:true }, function (err) {
     spinner.stop();
     generate(promptVal, tmp, to, function(){
@@ -144,7 +171,10 @@ function downloadTpl(promptVal) {
  */
 function generate(promptVal, src, dest, doneCallback){
   let projectName = promptVal.projectType;
-  if(projectName === 'react' || projectName === 'react-native'){
+  if(projectName === 'vue'){
+    //判断是管理系统还是wap系统 (取值是目录的名字)
+    projectName= promptVal.allvue === 'wapvue'? 'vue': 'vue-admin';
+  }else{
     console.log(chalk.green('项目模板还没写完，敬请期待!'));
     return ;
   }
