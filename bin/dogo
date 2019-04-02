@@ -11,8 +11,8 @@ const Metalsmith = require('metalsmith');
 const rm = require('rimraf').sync;
 
 const options={
-  gitHTTP: 'http://git.chongkouwei.com:wubida/fe-template',
-  gitSSH: 'gitlab:git.chongkouwei.com:wubida/fe-template'
+  gitHTTP: 'https://gitlab.iwubida.com:wubida/fe-template',
+  gitSSH: 'gitlab:gitlab.iwubida.com:wubida/fe-template'
 }
 program
   .version('1.0.2')
@@ -72,16 +72,12 @@ function startCli(){
         value: 'vue'
       },
       {
-        name: 'React',
-        value: 'react'
-      },
-      {
-        name: 'React-Native',
+        name: 'React Native',
         value: 'react-naitve'
       },
       {
-        name: 'Mpvue',
-        value: 'mpvue'
+        name: 'Taro 小程序',
+        value: 'taro-applet'
       }
     ]
   })
@@ -91,14 +87,14 @@ function startCli(){
     },
     type: 'list',
     name: 'allvue',
-    message: '看看哪个适合你，老板：',
+    message: '老板，看下哪个适合你：',
     choices: [
       {
-        name: 'wap vue',
-        value: 'wapvue'
+        name: 'H5项目',
+        value: 'h5vue'
       },
       {
-        name: 'admin vue',
+        name: 'Admin管理平台',
         value: 'adminvue'
       }
     ]
@@ -172,11 +168,13 @@ function downloadTpl(promptVal) {
 function generate(promptVal, src, dest, doneCallback){
   let projectName = promptVal.projectType;
   if(projectName === 'vue'){
-    //判断是管理系统还是wap系统 (取值是目录的名字)
-    projectName= promptVal.allvue === 'wapvue'? 'vue': 'vue-admin';
+    // 判断是管理系统还是wap系统 (取值是目录的名字)
+    projectName = promptVal.allvue === 'h5vue'? 'vue': 'vue-admin';
   }else{
-    console.log(chalk.green('项目模板还没写完，敬请期待!'));
-    return ;
+    console.log(promptVal.projectType)
+    projectName = promptVal.projectType
+    // console.log(chalk.green('项目模板还没写完，敬请期待!'));
+    // return ;
   }
   const metalsmith = Metalsmith(path.join(src, projectName));
   metalsmith
